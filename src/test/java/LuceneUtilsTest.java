@@ -6,6 +6,7 @@ import org.apache.lucene.document.Document;
 import org.apache.lucene.document.Field;
 import org.apache.lucene.document.TextField;
 import org.apache.lucene.index.DirectoryReader;
+import org.apache.lucene.index.IndexReader;
 import org.apache.lucene.index.IndexWriter;
 import org.apache.lucene.index.IndexWriterConfig;
 import org.apache.lucene.queryparser.classic.ParseException;
@@ -34,20 +35,28 @@ public class LuceneUtilsTest extends TestCase {
         doc.add(new Field("fieldname", text, TextField.TYPE_STORED));
         LuceneUtils.addIndex(indexWrtier, doc);
 
-        //无分页 查询
+
         FSDirectory directory = LuceneUtils.openFSDirectory("D:/testindex");
-        DirectoryReader ireader = DirectoryReader.open(directory);
-        IndexSearcher isearcher = new IndexSearcher(ireader);
+//        DirectoryReader ireader = DirectoryReader.open(directory);
+        // 开启类似实时热搜
+//        IndexReader indexReader = LuceneUtils.getIndexReader(directory, true);
+        // 不开启
+        IndexReader indexReader = LuceneUtils.getIndexReader(directory);
+        IndexSearcher isearcher = new IndexSearcher(indexReader);
         QueryParser parser = new QueryParser(Version.LUCENE_47, "fieldname", analyzer);
         Query query = parser.parse("分词");
+        //无分页 查询
         List<Document> documentList = LuceneUtils.query(isearcher, query);
         System.out.println(">>>>>>>>>>>>>>>" + documentList.size());
 
-        Page<Document> page = new Page<Document>(1, 10);
 
+        // 分页查询
+        Page<Document> page = new Page<Document>(1, 10);
         LuceneUtils.pageQuery(isearcher,query,page);
 
         System.out.println(">>>>>>>>>>>>>>>" + page.getItems().size());
+
+        assertEquals(1, page.getItems().size());
 
 
     }
