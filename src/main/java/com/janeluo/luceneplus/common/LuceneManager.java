@@ -59,21 +59,22 @@ public class LuceneManager {
 			throw new IllegalArgumentException("IndexWriterConfig can not be null.");
 		}
 		try {
-			writerLock.lock();
-			if(null == writer){
-				//如果索引目录被锁，则直接抛异常
-				if(IndexWriter.isLocked(dir)) {
-					throw new LockObtainFailedException("Directory of index had been locked.");
-				}
+//			writerLock.lock();
+//			if(null == writer){
+//				//如果索引目录被锁，则直接抛异常
+//				if(IndexWriter.isLocked(dir)) {
+//					throw new LockObtainFailedException("Directory of index had been locked.");
+//				}
 				writer = new IndexWriter(dir, config);
-			}
+//			}
 		} catch (LockObtainFailedException e) {
 			e.printStackTrace();
 		} catch (IOException e) {
 			e.printStackTrace();
-		} finally {
-			writerLock.unlock();
 		}
+//		finally {
+//			writerLock.unlock();
+//		}
 		return writer;
 	}
 
